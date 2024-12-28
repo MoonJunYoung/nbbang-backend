@@ -1,0 +1,17 @@
+.DS_Store
+test.py
+__pycache__/
+.env
+backend_error.log
+test/
+node_modules
+develop.db
+error.log
+development.db
+*.keystore
+pwa
+template
+build
+.vscode
+.venv
+.expo
