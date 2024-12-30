@@ -22,7 +22,7 @@ class DepositInformationData(BaseModel):
 
 
 class MeetingPresentation:
-    router = APIRouter(prefix="/api/meeting")
+    router = APIRouter(prefix="/meeting")
 
     @router.post("", status_code=201)
     async def add(

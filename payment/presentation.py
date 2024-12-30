@@ -1,9 +1,10 @@
+from fastapi import APIRouter, Depends, Header
+from pydantic import BaseModel
+
 from base.database_connector import get_db_session
 from base.exceptions import catch_exception
 from base.token import Token
-from fastapi import APIRouter, Depends, Header
 from payment.service import PaymentService
-from pydantic import BaseModel
 
 payment_service = PaymentService()
 
@@ -16,7 +17,7 @@ class PaymentData(BaseModel):
 
 
 class PaymentPresentation:
-    router = APIRouter(prefix="/api/meeting/{meeting_id}/payment")
+    router = APIRouter(prefix="/meeting/{meeting_id}/payment")
 
     @router.post("", status_code=201)
     async def create(
@@ -40,15 +41,29 @@ class PaymentPresentation:
             catch_exception(e)
 
     @router.get("", status_code=200)
-    async def read(
-        meeting_id, Authorization=Header(None), db_session=Depends(get_db_session)
+    async def read(meeting_id, Authorization=Header(None), db_session=Depends(get_db_session)):
+        try:
+            user_id = Token.get_user_id_by_token(token=Authorization)
+            payments = await payment_service.read(meeting_id=meeting_id, user_id=user_id, db_session=db_session)
+            return payments
+        except Exception as e:
+            catch_exception(e)
+
+    @router.put("/order", status_code=200)
+    async def update_payment_order(
+        meeting_id: int,
+        payment_order_data: list[int],
+        Authorization=Header(None),
+        db_session=Depends(get_db_session),
     ):
         try:
             user_id = Token.get_user_id_by_token(token=Authorization)
-            payments = await payment_service.read(
-                meeting_id=meeting_id, user_id=user_id, db_session=db_session
+            await payment_service.update_payment_order(
+                meeting_id=meeting_id,
+                payment_order_data=payment_order_data,
+                user_id=user_id,
+                db_session=db_session,
             )
-            return payments
         except Exception as e:
             catch_exception(e)
 
