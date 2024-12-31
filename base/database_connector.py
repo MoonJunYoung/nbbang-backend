@@ -18,7 +18,10 @@ else:
     user_name = os.environ.get("DB_USERNAME")
     passwd = os.environ.get("DB_PASSWD")
     database = os.environ.get("DB_DATABASE")
-    engine = create_engine(f"mysql+pymysql://{user_name}:{passwd}@{host}:{port}/{database}")
+    if service_env == "test":
+        engine = create_engine(f"mysql+pymysql://{user_name}:{passwd}@{host}:{port}/{database}-test")
+    else:
+        engine = create_engine(f"mysql+pymysql://{user_name}:{passwd}@{host}:{port}/{database}")
     SessionLocal = sessionmaker(bind=engine)
 
 
