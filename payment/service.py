@@ -76,13 +76,14 @@ class PaymentService:
     async def read(self, meeting_id, user_id, db_session):
         meeting = await self.meeting_repository.read_by_id(meeting_id, db_session)
         meeting.is_user_of_meeting(user_id)
-        payments = await self.payment_repository.read_list_by_meeting_id(
-            meeting.id, db_session
-        )
-        members = await self.memeber_repository.read_list_by_meeting_id(
-            meeting.id, db_session
-        )
+        payments = await self.payment_repository.read_list_by_meeting_id(meeting.id, db_session)
+        members = await self.memeber_repository.read_list_by_meeting_id(meeting.id, db_session)
         calculate = Calculate(members=members, payments=payments)
         calculate.split_payments()
 
         return set_DTO(PaymentDTO, payments)
+
+    async def update_payment_order(self, meeting_id, payment_order_data, user_id, db_session):
+        meeting = await self.meeting_repository.read_by_id(meeting_id, db_session)
+        meeting.is_user_of_meeting(user_id)
+        await self.payment_repository.update_order(payment_order_data, db_session)

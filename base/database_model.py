@@ -1,9 +1,10 @@
-from sqlalchemy import Boolean, Column, Integer, LargeBinary, String
-from sqlalchemy.ext.declarative import declarative_base
 import os
-from base.database_connector import engine
 
 from dotenv import load_dotenv
+from sqlalchemy import Boolean, Column, Integer, LargeBinary, String
+from sqlalchemy.ext.declarative import declarative_base
+
+from base.database_connector import engine
 
 load_dotenv()
 Base = declarative_base()
@@ -55,9 +56,7 @@ class MeetingModel(Base):
     bank = Column(LargeBinary)
     kakao_deposit_id = Column(String)
 
-    def __init__(
-        self, id, name, date, user_id, uuid, account_number, bank, kakao_deposit_id
-    ):
+    def __init__(self, id, name, date, user_id, uuid, account_number, bank, kakao_deposit_id):
         self.id = id
         self.name = name
         self.date = date
@@ -90,16 +89,18 @@ class PaymentModel(Base):
     pay_member_id = Column(Integer)
     attend_member_ids = Column(String)
     meeting_id = Column(Integer)
+    order_no = Column(Integer, default=None, nullable=True)
 
-    def __init__(self, id, place, price, pay_member_id, attend_member_ids, meeting_id):
+    def __init__(self, id, place, price, pay_member_id, attend_member_ids, meeting_id, order_no=None):
         self.id = id
         self.place = place
         self.price = price
         self.pay_member_id = pay_member_id
         self.attend_member_ids = attend_member_ids
         self.meeting_id = meeting_id
+        self.order_no = order_no
 
 
-status = os.environ.get("STATUS")
-if status == "development":
+service_env = os.environ.get("SERVICE_ENV")
+if service_env == "dev":
     Base.metadata.create_all(engine)

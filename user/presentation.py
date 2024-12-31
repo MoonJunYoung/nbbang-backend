@@ -1,11 +1,12 @@
 import json
 from typing import Optional
 
+from fastapi import APIRouter, Depends, Header, Request, Response, status
+from pydantic import BaseModel
+
 from base.database_connector import get_db_session
 from base.exceptions import NotAgerrmentExcption, catch_exception
 from base.token import Token
-from fastapi import APIRouter, Depends, Header, Response, status, Request
-from pydantic import BaseModel
 from user.service import UserService
 
 user_service = UserService()
@@ -33,17 +34,11 @@ class DepositInformationData(BaseModel):
 
 async def oauth_login(platform, oauth: OauthData, request: Request, db_session):
     if platform == "kakao":
-        get_user_platform_information = (
-            Token.get_user_name_and_platform_id_by_kakao_oauth
-        )
+        get_user_platform_information = Token.get_user_name_and_platform_id_by_kakao_oauth
     elif platform == "naver":
-        get_user_platform_information = (
-            Token.get_user_name_and_platform_id_by_naver_oauth
-        )
+        get_user_platform_information = Token.get_user_name_and_platform_id_by_naver_oauth
     elif platform == "google":
-        get_user_platform_information = (
-            Token.get_user_name_and_platform_id_by_google_oauth
-        )
+        get_user_platform_information = Token.get_user_name_and_platform_id_by_google_oauth
 
     if oauth.token:
         name, platform_id = await get_user_platform_information(oauth.token)
@@ -64,21 +59,17 @@ async def oauth_login(platform, oauth: OauthData, request: Request, db_session):
         return Token.create_token_by_user_id(user.id)
 
     elif oauth.agreement and oauth.platform and oauth.platform_id and oauth.name:
-        user = await user_service.oauth_signup(
-            oauth.name, oauth.platform_id, oauth.platform, db_session
-        )
+        user = await user_service.oauth_signup(oauth.name, oauth.platform_id, oauth.platform, db_session)
         return Token.create_token_by_user_id(user.id)
     else:
         raise NotAgerrmentExcption
 
 
 class UserPresentation:
-    router = APIRouter(prefix="/api/user")
+    router = APIRouter(prefix="/user")
 
     @router.get("", status_code=200)
-    async def read(
-        Authorization: str = Header(None), db_session=Depends(get_db_session)
-    ):
+    async def read(Authorization: str = Header(None), db_session=Depends(get_db_session)):
         try:
             user_id = Token.get_user_id_by_token(Authorization)
             return await user_service.read(user_id, db_session)
@@ -87,9 +78,7 @@ class UserPresentation:
             catch_exception(e)
 
     @router.delete("", status_code=204)
-    async def delete(
-        Authorization: str = Header(None), db_session=Depends(get_db_session)
-    ):
+    async def delete(Authorization: str = Header(None), db_session=Depends(get_db_session)):
         try:
             user_id = Token.get_user_id_by_token(Authorization)
             await user_service.delete(user_id, db_session)
