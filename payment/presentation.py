@@ -20,15 +20,15 @@ class PaymentPresentation:
     router = APIRouter(prefix="/meeting/{meeting_id}/payment")
 
     @router.post("", status_code=201)
-    async def create(
+    def create(
         meeting_id,
         payment_data: PaymentData,
-        Authorization=Header(None),
+        Authorization=Depends(Token.get_token_by_authorization),
         db_session=Depends(get_db_session),
     ):
         try:
             user_id = Token.get_user_id_by_token(token=Authorization)
-            await payment_service.create(
+            payment_service.create(
                 place=payment_data.place,
                 price=payment_data.price,
                 pay_member_id=payment_data.pay_member_id,
@@ -41,24 +41,24 @@ class PaymentPresentation:
             catch_exception(e)
 
     @router.get("", status_code=200)
-    async def read(meeting_id, Authorization=Header(None), db_session=Depends(get_db_session)):
+    def read(meeting_id, Authorization=Depends(Token.get_token_by_authorization), db_session=Depends(get_db_session)):
         try:
             user_id = Token.get_user_id_by_token(token=Authorization)
-            payments = await payment_service.read(meeting_id=meeting_id, user_id=user_id, db_session=db_session)
+            payments = payment_service.read(meeting_id=meeting_id, user_id=user_id, db_session=db_session)
             return payments
         except Exception as e:
             catch_exception(e)
 
     @router.put("/order", status_code=200)
-    async def update_payment_order(
+    def update_payment_order(
         meeting_id: int,
         payment_order_data: list[int],
-        Authorization=Header(None),
+        Authorization=Depends(Token.get_token_by_authorization),
         db_session=Depends(get_db_session),
     ):
         try:
             user_id = Token.get_user_id_by_token(token=Authorization)
-            await payment_service.update_payment_order(
+            payment_service.update_payment_order(
                 meeting_id=meeting_id,
                 payment_order_data=payment_order_data,
                 user_id=user_id,
@@ -68,16 +68,16 @@ class PaymentPresentation:
             catch_exception(e)
 
     @router.put("/{payment_id}", status_code=200)
-    async def update(
+    def update(
         meeting_id: int,
         payment_id: int,
         payment_data: PaymentData,
-        Authorization=Header(None),
+        Authorization=Depends(Token.get_token_by_authorization),
         db_session=Depends(get_db_session),
     ):
         try:
             user_id = Token.get_user_id_by_token(token=Authorization)
-            await payment_service.update(
+            payment_service.update(
                 id=payment_id,
                 place=payment_data.place,
                 price=payment_data.price,
@@ -91,15 +91,15 @@ class PaymentPresentation:
             catch_exception(e)
 
     @router.delete("/{payment_id}", status_code=200)
-    async def delete(
+    def delete(
         meeting_id: int,
         payment_id: int,
-        Authorization=Header(None),
+        Authorization=Depends(Token.get_token_by_authorization),
         db_session=Depends(get_db_session),
     ):
         try:
             user_id = Token.get_user_id_by_token(token=Authorization)
-            await payment_service.delete(
+            payment_service.delete(
                 id=payment_id,
                 meeting_id=meeting_id,
                 user_id=user_id,

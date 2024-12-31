@@ -14,7 +14,7 @@ class PaymentService:
         self.payment_repository = PaymentRepository()
         self.memeber_repository = MemberRepository()
 
-    async def create(
+    def create(
         self,
         place,
         price,
@@ -24,7 +24,7 @@ class PaymentService:
         user_id,
         db_session,
     ):
-        meeting = await self.meeting_repository.read_by_id(meeting_id, db_session)
+        meeting = self.meeting_repository.read_by_id(meeting_id, db_session)
         meeting.is_user_of_meeting(user_id)
         payment = Payment(
             id=None,
@@ -34,10 +34,10 @@ class PaymentService:
             attend_member_ids=attend_member_ids,
             meeting_id=meeting_id,
         )
-        await self.payment_repository.create(payment, db_session)
+        self.payment_repository.create(payment, db_session)
         return payment
 
-    async def update(
+    def update(
         self,
         id,
         place,
@@ -48,7 +48,7 @@ class PaymentService:
         user_id,
         db_session,
     ):
-        meeting = await self.meeting_repository.read_by_id(meeting_id, db_session)
+        meeting = self.meeting_repository.read_by_id(meeting_id, db_session)
         meeting.is_user_of_meeting(user_id)
         payment = Payment(
             id=id,
@@ -58,10 +58,10 @@ class PaymentService:
             attend_member_ids=attend_member_ids,
             meeting_id=meeting_id,
         )
-        await self.payment_repository.update(payment, db_session)
+        self.payment_repository.update(payment, db_session)
 
-    async def delete(self, id, meeting_id, user_id, db_session):
-        meeting = await self.meeting_repository.read_by_id(meeting_id, db_session)
+    def delete(self, id, meeting_id, user_id, db_session):
+        meeting = self.meeting_repository.read_by_id(meeting_id, db_session)
         meeting.is_user_of_meeting(user_id)
         payment = Payment(
             id=id,
@@ -71,19 +71,19 @@ class PaymentService:
             attend_member_ids=None,
             meeting_id=meeting_id,
         )
-        await self.payment_repository.delete(payment, db_session)
+        self.payment_repository.delete(payment, db_session)
 
-    async def read(self, meeting_id, user_id, db_session):
-        meeting = await self.meeting_repository.read_by_id(meeting_id, db_session)
+    def read(self, meeting_id, user_id, db_session):
+        meeting = self.meeting_repository.read_by_id(meeting_id, db_session)
         meeting.is_user_of_meeting(user_id)
-        payments = await self.payment_repository.read_list_by_meeting_id(meeting.id, db_session)
-        members = await self.memeber_repository.read_list_by_meeting_id(meeting.id, db_session)
+        payments = self.payment_repository.read_list_by_meeting_id(meeting.id, db_session)
+        members = self.memeber_repository.read_list_by_meeting_id(meeting.id, db_session)
         calculate = Calculate(members=members, payments=payments)
         calculate.split_payments()
 
         return set_DTO(PaymentDTO, payments)
 
-    async def update_payment_order(self, meeting_id, payment_order_data, user_id, db_session):
-        meeting = await self.meeting_repository.read_by_id(meeting_id, db_session)
+    def update_payment_order(self, meeting_id, payment_order_data, user_id, db_session):
+        meeting = self.meeting_repository.read_by_id(meeting_id, db_session)
         meeting.is_user_of_meeting(user_id)
-        await self.payment_repository.update_order(payment_order_data, db_session)
+        self.payment_repository.update_order(payment_order_data, db_session)

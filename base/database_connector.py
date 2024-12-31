@@ -9,7 +9,7 @@ load_dotenv()
 service_env = os.environ.get("SERVICE_ENV")
 
 if service_env == "dev":
-    engine = create_engine("sqlite:///dev.db")
+    engine = create_engine("mysql+pymysql://root:answnsdud1@localhost:3306/nbbang")
     SessionLocal = sessionmaker(bind=engine)
 
 else:

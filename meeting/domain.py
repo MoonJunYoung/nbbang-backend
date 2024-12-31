@@ -18,6 +18,10 @@ class Meeting:
         bank=None,
         account_number=None,
         kakao_deposit_id=None,
+        is_simple=False,
+        simple_price=None,
+        simple_member_count=None,
+        simple_member_amount=None,
     ) -> None:
         self.id = id
         self.name = name
@@ -26,6 +30,17 @@ class Meeting:
         self.uuid = uuid
         self.toss_deposit_information = TossDepositInformation(bank, account_number)
         self.kakao_deposit_information = KakaoDepositInformation(kakao_deposit_id)
+        self.is_simple = is_simple
+        self.simple_price = simple_price
+        self.simple_member_count = simple_member_count
+        self.simple_member_amount = simple_member_amount
+        if self.is_simple and self.simple_price and self.simple_member_count:
+            split_price = (
+                self.simple_price // self.simple_member_count + 1
+                if self.simple_price % self.simple_member_count
+                else self.simple_price / self.simple_member_count
+            )
+            self.simple_member_amount = split_price
 
     @staticmethod
     def create_template(user_id):
@@ -35,6 +50,19 @@ class Meeting:
             date=datetime.date.isoformat(datetime.date.today()),
             user_id=user_id,
             uuid=str(uuid.uuid4()),
+        )
+
+    @staticmethod
+    def create_simple_template(user_id):
+        return Meeting(
+            id=None,
+            name="모임명을 설정해주세요",
+            date=datetime.date.isoformat(datetime.date.today()),
+            user_id=user_id,
+            uuid=str(uuid.uuid4()),
+            is_simple=True,
+            simple_price=None,
+            simple_member_count=None,
         )
 
     def load_user_deposit_information(self, user: User):
@@ -59,7 +87,10 @@ class Meeting:
             raise MeetingUserMismatchException(user_id, self.id)
 
     def create_share_link(self):
-        self.share_link = f"https://nbbang.life/share?meeting={self.uuid}"
+        if self.is_simple:
+            self.share_link = f"https://nbbang.life/share?simple-meeting={self.uuid}"
+        else:
+            self.share_link = f"https://nbbang.life/share?meeting={self.uuid}"
 
 
 class Date:

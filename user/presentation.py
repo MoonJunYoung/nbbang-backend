@@ -1,7 +1,8 @@
 import json
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Header, Request, Response, status
+from fastapi import APIRouter, Depends, Header, Request, Response, Security, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel
 
 from base.database_connector import get_db_session
@@ -32,7 +33,7 @@ class DepositInformationData(BaseModel):
     kakao_deposit_id: Optional[str] = None
 
 
-async def oauth_login(platform, oauth: OauthData, request: Request, db_session):
+def oauth_login(platform, oauth: OauthData, request: Request, db_session):
     if platform == "kakao":
         get_user_platform_information = Token.get_user_name_and_platform_id_by_kakao_oauth
     elif platform == "naver":
@@ -41,8 +42,8 @@ async def oauth_login(platform, oauth: OauthData, request: Request, db_session):
         get_user_platform_information = Token.get_user_name_and_platform_id_by_google_oauth
 
     if oauth.token:
-        name, platform_id = await get_user_platform_information(oauth.token)
-        user = await user_service.oauth_signin(name, platform_id, platform, db_session)
+        name, platform_id = get_user_platform_information(oauth.token)
+        user = user_service.oauth_signin(name, platform_id, platform, db_session)
         if not user:
             return Response(
                 content=json.dumps(
@@ -59,7 +60,7 @@ async def oauth_login(platform, oauth: OauthData, request: Request, db_session):
         return Token.create_token_by_user_id(user.id)
 
     elif oauth.agreement and oauth.platform and oauth.platform_id and oauth.name:
-        user = await user_service.oauth_signup(oauth.name, oauth.platform_id, oauth.platform, db_session)
+        user = user_service.oauth_signup(oauth.name, oauth.platform_id, oauth.platform, db_session)
         return Token.create_token_by_user_id(user.id)
     else:
         raise NotAgerrmentExcption
@@ -69,27 +70,27 @@ class UserPresentation:
     router = APIRouter(prefix="/user")
 
     @router.get("", status_code=200)
-    async def read(Authorization: str = Header(None), db_session=Depends(get_db_session)):
+    def read(Authorization: Optional[HTTPAuthorizationCredentials] = Security(HTTPBearer(auto_error=False))):
         try:
             user_id = Token.get_user_id_by_token(Authorization)
-            return await user_service.read(user_id, db_session)
+            return user_service.read(user_id, db_session)
 
         except Exception as e:
             catch_exception(e)
 
     @router.delete("", status_code=204)
-    async def delete(Authorization: str = Header(None), db_session=Depends(get_db_session)):
+    def delete(Authorization: str = Header(None), db_session=Depends(get_db_session)):
         try:
             user_id = Token.get_user_id_by_token(Authorization)
-            await user_service.delete(user_id, db_session)
+            user_service.delete(user_id, db_session)
 
         except Exception as e:
             catch_exception(e)
 
     @router.post("/sign-up", status_code=201)
-    async def sign_up(login_data: LogInData, db_session=Depends(get_db_session)):
+    def sign_up(login_data: LogInData, db_session=Depends(get_db_session)):
         try:
-            user_id = await user_service.sign_up(
+            user_id = user_service.sign_up(
                 identifier=login_data.identifier,
                 password=login_data.password,
                 name=login_data.name,
@@ -101,9 +102,9 @@ class UserPresentation:
             catch_exception(e)
 
     @router.post("/sign-in", status_code=201)
-    async def sign_in(login_data: LogInData, db_session=Depends(get_db_session)):
+    def sign_in(login_data: LogInData, db_session=Depends(get_db_session)):
         try:
-            user_id = await user_service.sign_in(
+            user_id = user_service.sign_in(
                 identifier=login_data.identifier,
                 password=login_data.password,
                 db_session=db_session,
@@ -113,51 +114,51 @@ class UserPresentation:
             catch_exception(e)
 
     @router.post("/google-login", status_code=201)
-    async def google_login(
+    def google_login(
         oauth: OauthData,
         request: Request,
         db_session=Depends(get_db_session),
     ):
         try:
             platform = "google"
-            return await oauth_login(platform, oauth, request, db_session)
+            return oauth_login(platform, oauth, request, db_session)
 
         except Exception as e:
             catch_exception(e)
 
     @router.post("/kakao-login", status_code=201)
-    async def kakao_login(
+    def kakao_login(
         oauth: OauthData,
         request: Request,
         db_session=Depends(get_db_session),
     ):
         try:
             platform = "kakao"
-            return await oauth_login(platform, oauth, request, db_session)
+            return oauth_login(platform, oauth, request, db_session)
         except Exception as e:
             catch_exception(e)
 
     @router.post("/naver-login", status_code=201)
-    async def naver_login(
+    def naver_login(
         oauth: OauthData,
         request: Request,
         db_session=Depends(get_db_session),
     ):
         try:
             platform = "naver"
-            return await oauth_login(platform, oauth, request, db_session)
+            return oauth_login(platform, oauth, request, db_session)
         except Exception as e:
             catch_exception(e)
 
     @router.put("/kakao-deposit-id", status_code=200)
-    async def edit_kakao_deposit_information(
+    def edit_kakao_deposit_information(
         deposit_information_data: DepositInformationData,
-        Authorization=Header(None),
+        Authorization=Depends(Token.get_token_by_authorization),
         db_session=Depends(get_db_session),
     ):
         try:
             user_id = Token.get_user_id_by_token(token=Authorization)
-            await user_service.edit_kakao_deposit(
+            user_service.edit_kakao_deposit(
                 user_id=user_id,
                 kakao_deposit_id=deposit_information_data.kakao_deposit_id,
                 db_session=db_session,
@@ -166,14 +167,14 @@ class UserPresentation:
             catch_exception(e)
 
     @router.put("/bank-account", status_code=200)
-    async def edit_toss_deposit_information(
+    def edit_toss_deposit_information(
         deposit_information_data: DepositInformationData,
-        Authorization=Header(None),
+        Authorization=Depends(Token.get_token_by_authorization),
         db_session=Depends(get_db_session),
     ):
         try:
             user_id = Token.get_user_id_by_token(token=Authorization)
-            await user_service.edit_toss_deposit(
+            user_service.edit_toss_deposit(
                 user_id=user_id,
                 bank=deposit_information_data.bank,
                 account_number=deposit_information_data.account_number,
