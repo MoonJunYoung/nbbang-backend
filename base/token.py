@@ -43,6 +43,8 @@ class Token:
         return name, platform_id
 
     async def get_user_name_and_platform_id_by_kakao_oauth(token):
+        print("token", token)
+
         def _get_user_access_token_by_kakao_oauth(token):
             data = {
                 "grant_type": "authorization_code",
