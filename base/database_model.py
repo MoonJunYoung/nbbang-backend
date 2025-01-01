@@ -1,7 +1,7 @@
 import os
 
 from dotenv import load_dotenv
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, LargeBinary, String
+from sqlalchemy import Boolean, Column, Integer, LargeBinary, String
 from sqlalchemy.ext.declarative import declarative_base
 
 from base.database_connector import engine

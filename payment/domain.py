@@ -3,9 +3,7 @@ from member.domain import Member
 
 
 class Payment:
-    def __init__(
-        self, id, place, price, pay_member_id, attend_member_ids, meeting_id
-    ) -> None:
+    def __init__(self, id, place, price, pay_member_id, attend_member_ids, meeting_id) -> None:
         self.id = id
         self.place = place
         self.price = price
@@ -22,11 +20,7 @@ class Payment:
         attend_members_count = len(self.attend_member_ids)
         if not self.attend_member_ids:
             return 0
-        split_price = (
-            self.price // attend_members_count + 1
-            if self.price % attend_members_count
-            else self.price / attend_members_count
-        )
+        split_price = self.price // attend_members_count + 1 if self.price % attend_members_count else self.price / attend_members_count
         self.split_price = split_price
 
     def set_attend_members_name(self, members: list[Member]):

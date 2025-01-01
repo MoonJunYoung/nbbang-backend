@@ -1,12 +1,9 @@
-from fastapi import APIRouter, Depends, Header
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from base.database_connector import get_db_session
 from base.exceptions import catch_exception
 from base.token import Token
-from payment.service import PaymentService
-
-payment_service = PaymentService()
+from payment.service import PaymentService, get_payment_service
 
 
 class PaymentData(BaseModel):
@@ -23,8 +20,8 @@ class PaymentPresentation:
     def create(
         meeting_id,
         payment_data: PaymentData,
+        payment_service: PaymentService = Depends(get_payment_service),
         Authorization=Depends(Token.get_token_by_authorization),
-        db_session=Depends(get_db_session),
     ):
         try:
             user_id = Token.get_user_id_by_token(token=Authorization)
@@ -35,16 +32,19 @@ class PaymentPresentation:
                 attend_member_ids=payment_data.attend_member_ids,
                 meeting_id=meeting_id,
                 user_id=user_id,
-                db_session=db_session,
             )
         except Exception as e:
             catch_exception(e)
 
     @router.get("", status_code=200)
-    def read(meeting_id, Authorization=Depends(Token.get_token_by_authorization), db_session=Depends(get_db_session)):
+    def read(
+        meeting_id,
+        payment_service: PaymentService = Depends(get_payment_service),
+        Authorization=Depends(Token.get_token_by_authorization),
+    ):
         try:
             user_id = Token.get_user_id_by_token(token=Authorization)
-            payments = payment_service.read(meeting_id=meeting_id, user_id=user_id, db_session=db_session)
+            payments = payment_service.read(meeting_id=meeting_id, user_id=user_id)
             return payments
         except Exception as e:
             catch_exception(e)
@@ -53,8 +53,8 @@ class PaymentPresentation:
     def update_payment_order(
         meeting_id: int,
         payment_order_data: list[int],
+        payment_service: PaymentService = Depends(get_payment_service),
         Authorization=Depends(Token.get_token_by_authorization),
-        db_session=Depends(get_db_session),
     ):
         try:
             user_id = Token.get_user_id_by_token(token=Authorization)
@@ -62,7 +62,6 @@ class PaymentPresentation:
                 meeting_id=meeting_id,
                 payment_order_data=payment_order_data,
                 user_id=user_id,
-                db_session=db_session,
             )
         except Exception as e:
             catch_exception(e)
@@ -72,8 +71,8 @@ class PaymentPresentation:
         meeting_id: int,
         payment_id: int,
         payment_data: PaymentData,
+        payment_service: PaymentService = Depends(get_payment_service),
         Authorization=Depends(Token.get_token_by_authorization),
-        db_session=Depends(get_db_session),
     ):
         try:
             user_id = Token.get_user_id_by_token(token=Authorization)
@@ -85,7 +84,6 @@ class PaymentPresentation:
                 attend_member_ids=payment_data.attend_member_ids,
                 meeting_id=meeting_id,
                 user_id=user_id,
-                db_session=db_session,
             )
         except Exception as e:
             catch_exception(e)
@@ -94,8 +92,8 @@ class PaymentPresentation:
     def delete(
         meeting_id: int,
         payment_id: int,
+        payment_service: PaymentService = Depends(get_payment_service),
         Authorization=Depends(Token.get_token_by_authorization),
-        db_session=Depends(get_db_session),
     ):
         try:
             user_id = Token.get_user_id_by_token(token=Authorization)
@@ -103,7 +101,6 @@ class PaymentPresentation:
                 id=payment_id,
                 meeting_id=meeting_id,
                 user_id=user_id,
-                db_session=db_session,
             )
         except Exception as e:
             catch_exception(e)

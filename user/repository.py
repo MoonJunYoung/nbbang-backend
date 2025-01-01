@@ -5,7 +5,10 @@ from user.domain import User
 
 
 class UserRepository:
-    def create(self, user: User, db_session: Session):
+    def __init__(self, db_session: Session):
+        self.db_session = db_session
+
+    def create(self, user: User):
         user_model = UserModel(
             id=None,
             name=user.name,
@@ -17,17 +20,17 @@ class UserRepository:
             identifier=user.identifier,
             password=user.password,
         )
-        db_session.add(user_model)
-        db_session.commit()
+        self.db_session.add(user_model)
+        self.db_session.commit()
         user.id = user_model.id
 
-    def delete(self, user_id, db_session: Session):
-        user_model = db_session.query(UserModel).filter(UserModel.id == user_id).first()
-        db_session.delete(user_model)
-        db_session.commit()
+    def delete(self, user_id):
+        user_model = self.db_session.query(UserModel).filter(UserModel.id == user_id).first()
+        self.db_session.delete(user_model)
+        self.db_session.commit()
 
-    def read_by_identifier(self, identifier, db_session: Session):
-        user_model = db_session.query(UserModel).filter(UserModel.identifier == identifier).first()
+    def read_by_identifier(self, identifier):
+        user_model = self.db_session.query(UserModel).filter(UserModel.identifier == identifier).first()
         if not user_model:
             return None
         user = User(
@@ -40,8 +43,8 @@ class UserRepository:
         )
         return user
 
-    def read_by_platform_id(self, platform, platform_id, db_session: Session):
-        user_model = db_session.query(UserModel).filter(UserModel.platform == platform).filter(UserModel.platform_id == platform_id).first()
+    def read_by_platform_id(self, platform, platform_id):
+        user_model = self.db_session.query(UserModel).filter(UserModel.platform == platform).filter(UserModel.platform_id == platform_id).first()
         if not user_model:
             return None
         user = User(
@@ -54,8 +57,8 @@ class UserRepository:
         )
         return user
 
-    def read_by_user_id(self, user_id, db_session: Session):
-        user_model = db_session.query(UserModel).filter(UserModel.id == user_id).first()
+    def read_by_user_id(self, user_id):
+        user_model = self.db_session.query(UserModel).filter(UserModel.id == user_id).first()
         if not user_model:
             return None
         user = User(
@@ -71,13 +74,13 @@ class UserRepository:
         )
         return user
 
-    def update_toss_deposit(self, user: User, db_session: Session):
-        user_model = db_session.query(UserModel).filter(UserModel.id == user.id).first()
+    def update_toss_deposit(self, user: User):
+        user_model = self.db_session.query(UserModel).filter(UserModel.id == user.id).first()
         user_model.bank = user.toss_deposit_information.bank
         user_model.account_number = user.toss_deposit_information.account_number
-        db_session.commit()
+        self.db_session.commit()
 
-    def update_kakao_deposit(self, user: User, db_session: Session):
-        user_model = db_session.query(UserModel).filter(UserModel.id == user.id).first()
+    def update_kakao_deposit(self, user: User):
+        user_model = self.db_session.query(UserModel).filter(UserModel.id == user.id).first()
         user_model.kakao_deposit_id = user.kakao_deposit_information.kakao_deposit_id
-        db_session.commit()
+        self.db_session.commit()
