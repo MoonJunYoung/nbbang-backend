@@ -55,9 +55,10 @@ class Token:
             return access_token
 
         access_token = _get_user_access_token_by_kakao_oauth(token)
+        print("access_token", access_token)
         headers = {"Authorization": f"Bearer {access_token}"}
         kakao_user_data = json.loads(requests.get(url="https://kapi.kakao.com/v2/user/me", headers=headers).text)
-        print(kakao_user_data)
+        print("kakao_user_data", kakao_user_data)
         platform_id = str(kakao_user_data.get("id"))
         name = kakao_user_data.get("kakao_account").get("profile").get("nickname")
         return name, platform_id
