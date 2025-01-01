@@ -53,11 +53,11 @@ class Token:
                 "code": token,
             }
             kakao_token_data = json.loads(requests.post(url=f"https://kauth.kakao.com/oauth/token", data=data).text)
+            print("kakao_token_data", kakao_token_data)
             access_token = kakao_token_data.get("access_token")
             return access_token
 
         access_token = _get_user_access_token_by_kakao_oauth(token)
-        print("access_token", access_token)
         headers = {"Authorization": f"Bearer {access_token}"}
         kakao_user_data = json.loads(requests.get(url="https://kapi.kakao.com/v2/user/me", headers=headers).text)
         print("kakao_user_data", kakao_user_data)
