@@ -59,11 +59,6 @@ class MeetingRepository:
         self.db_session.delete(meeting_model)
         self.db_session.commit()
 
-    def delete_simple_meeting_data(self, meeting_id):
-        simple_meeting_data_model = self.db_session.query(SimpleMeetingDataModel).filter(SimpleMeetingDataModel.meeting_id == meeting_id).first()
-        self.db_session.delete(simple_meeting_data_model)
-        self.db_session.commit()
-
     def read_list_by_user_id(self, user_id) -> list[Meeting]:
         meetings = list()
         meeting_models = self.db_session.query(MeetingModel).filter(MeetingModel.user_id == user_id).order_by(MeetingModel.id.desc()).all()

@@ -64,7 +64,6 @@ class MeetingService:
         meeting.is_user_of_meeting(user_id)
         if meeting.is_simple:
             self.meeting_repository.delete(meeting)
-            self.meeting_repository.delete_simple_meeting_data(meeting.id)
         else:
             self.meeting_repository.delete(meeting)
             self.member_repository.delete_by_meeting_id(meeting.id)
