@@ -28,7 +28,6 @@ class PaymentService:
         attend_member_ids,
         meeting_id,
         user_id,
-        db_session,
     ):
         meeting = self.meeting_repository.read_by_id(meeting_id)
         meeting.is_user_of_meeting(user_id)
@@ -40,7 +39,7 @@ class PaymentService:
             attend_member_ids=attend_member_ids,
             meeting_id=meeting_id,
         )
-        self.payment_repository.create(payment, db_session)
+        self.payment_repository.create(payment)
         return payment
 
     def update(
@@ -52,7 +51,6 @@ class PaymentService:
         attend_member_ids,
         meeting_id,
         user_id,
-        db_session,
     ):
         meeting = self.meeting_repository.read_by_id(meeting_id)
         meeting.is_user_of_meeting(user_id)
@@ -64,7 +62,7 @@ class PaymentService:
             attend_member_ids=attend_member_ids,
             meeting_id=meeting_id,
         )
-        self.payment_repository.update(payment, db_session)
+        self.payment_repository.update(payment)
 
     def delete(self, id, meeting_id, user_id):
         meeting = self.meeting_repository.read_by_id(meeting_id)
