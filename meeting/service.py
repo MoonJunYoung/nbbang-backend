@@ -25,6 +25,7 @@ class MeetingService:
     def add(self, user_id):
         user = self.user_repository.read_by_user_id(user_id)
         meeting = Meeting.create_template(user_id)
+        print(meeting.__dict__)
         meeting.load_user_deposit_information(user)
         self.meeting_repository.create(meeting)
         return meeting

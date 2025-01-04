@@ -20,6 +20,8 @@ class MeetingRepository:
             bank=meeting.toss_deposit_information.bank,
             kakao_deposit_id=meeting.kakao_deposit_information.kakao_deposit_id,
             is_simple=meeting.is_simple,
+            simple_price=meeting.simple_price,
+            simple_member_count=meeting.simple_member_count,
         )
         self.db_session.add(meeting_model)
         self.db_session.commit()
