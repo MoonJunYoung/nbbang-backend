@@ -73,7 +73,7 @@ class UserPresentation:
 
     @router.get("", status_code=200)
     def read(
-        Authorization: Optional[HTTPAuthorizationCredentials] = Security(HTTPBearer(auto_error=False)),
+        Authorization: str = Depends(Token.get_token_by_authorization),
         user_service: UserService = Depends(get_user_service),
     ):
         try:
