@@ -9,8 +9,8 @@ class MeetingRequest(BaseModel):
 
 
 class SimpleMeetingRequest(MeetingRequest):
-    price: int = None
-    member_count: int = None
+    simple_price: int = None
+    simple_member_count: int = None
 
 
 class DepositInformationRequest(BaseModel):
