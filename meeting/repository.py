@@ -39,8 +39,8 @@ class MeetingRepository:
             raise Exception("Meeting not found")
         meeting_model.name = simple_meeting_request.name
         meeting_model.date = simple_meeting_request.date
-        meeting_model.simple_price = simple_meeting_request.price
-        meeting_model.simple_member_count = simple_meeting_request.member_count
+        meeting_model.simple_price = simple_meeting_request.simple_price
+        meeting_model.simple_member_count = simple_meeting_request.simple_member_count
         self.db_session.commit()
 
     def update_toss_deposit(self, meeting: Meeting):
