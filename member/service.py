@@ -51,7 +51,7 @@ class MemberService:
             self.member_repository.update(pre_leader_member)
         self.member_repository.update(member)
 
-    def delete(self, member_id, meeting_id, user_id, db_session):
+    def delete(self, member_id, meeting_id, user_id):
         meeting = self.meeting_repository.read_by_id(meeting_id)
         meeting.is_user_of_meeting(user_id)
         member = self.member_repository.read_by_id(member_id)
