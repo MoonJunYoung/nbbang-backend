@@ -1,6 +1,8 @@
 import datetime
+import math
 import re
 import uuid
+from urllib import parse
 
 from base.exceptions import MeetingUserMismatchException
 from base.vo import KakaoDepositInformation, TossDepositInformation
@@ -91,6 +93,52 @@ class Meeting:
             self.share_link = f"https://nbbang.life/share?simple-meeting={self.uuid}"
         else:
             self.share_link = f"https://nbbang.life/share?meeting={self.uuid}"
+
+    def _create_toss_deposit_link(self, amount, bank, account_number):
+        base_url = "supertoss://send"
+        params = {
+            "amount": int(amount),
+            "bank": bank,
+            "accountNo": account_number,
+        }
+        encoded_params = parse.urlencode(params)
+        encoded_url = f"{base_url}?{encoded_params}"
+        return encoded_url
+
+    def _create_kakako_deposit_link(self, amount, kakao_deposit_id):
+        def _to_hex_value(value):
+            return format(value * 524288, "x")
+
+        base_url = "https://qr.kakaopay.com/{kakao_deposit_id}{hex_amount}"
+        hex_amount = _to_hex_value(int(amount))
+        send_link = base_url.format(
+            kakao_deposit_id=kakao_deposit_id,
+            hex_amount=hex_amount,
+        )
+        return send_link
+
+    def _create_deposit_copy_text(self, amount, bank, account_number):
+        return f"{bank} {account_number} {int(amount)}원"
+
+    def create_simple_deposit_link(self):
+        deposit_amount = self.simple_price // self.simple_member_count
+        tipped_deposit_amount = math.ceil(self.simple_price / self.simple_member_count) * 10
+        if self.toss_deposit_information.bank and self.toss_deposit_information.account_number:
+            self.toss_deposit_link = self._create_toss_deposit_link(
+                deposit_amount, self.toss_deposit_information.bank, self.toss_deposit_information.account_number
+            )
+            self.tipped_toss_deposit_link = self._create_toss_deposit_link(
+                tipped_deposit_amount, self.toss_deposit_information.bank, self.toss_deposit_information.account_number
+            )
+            self.deposit_copy_text = self._create_deposit_copy_text(
+                deposit_amount, self.toss_deposit_information.bank, self.toss_deposit_information.account_number
+            )
+            self.tipped_deposit_copy_text = self._create_deposit_copy_text(
+                tipped_deposit_amount, self.toss_deposit_information.bank, self.toss_deposit_information.account_number
+            )
+        if self.kakao_deposit_information.kakao_deposit_id:
+            self.kakao_deposit_link = self._create_kakako_deposit_link(deposit_amount, self.kakao_deposit_information.kakao_deposit_id)
+            self.tipped_kakao_deposit_link = self._create_kakako_deposit_link(tipped_deposit_amount, self.kakao_deposit_information.kakao_deposit_id)
 
 
 class Date:

@@ -90,6 +90,7 @@ class MeetingService:
         if not meeting:
             raise SharePageNotMeetingExcption
         if meeting.is_simple:
+            meeting.create_simple_deposit_link()
             return {"meeting": meeting}
         else:
             members = self.member_repository.read_list_by_meeting_id(meeting.id)
