@@ -122,7 +122,8 @@ class Meeting:
 
     def create_simple_deposit_link(self):
         deposit_amount = self.simple_price // self.simple_member_count
-        tipped_deposit_amount = math.ceil(self.simple_price / self.simple_member_count) * 10
+        tipped_deposit_amount = math.ceil((self.simple_price / self.simple_member_count) / 10) * 10
+        self.simple_tipped_member_amount = tipped_deposit_amount
         if self.toss_deposit_information.bank and self.toss_deposit_information.account_number:
             self.toss_deposit_link = self._create_toss_deposit_link(
                 deposit_amount, self.toss_deposit_information.bank, self.toss_deposit_information.account_number

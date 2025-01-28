@@ -90,6 +90,8 @@ class MeetingService:
         if not meeting:
             raise SharePageNotMeetingExcption
         if meeting.is_simple:
+            if not meeting.simple_price or not meeting.simple_member_count:
+                raise IncompleteShareExcption
             meeting.create_simple_deposit_link()
             return {"meeting": meeting}
         else:
