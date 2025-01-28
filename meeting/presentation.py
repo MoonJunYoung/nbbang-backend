@@ -44,7 +44,7 @@ class MeetingPresentation:
             catch_exception(e, request)
 
     @router.get("/simple/{meeting_id}", status_code=200)
-    def read_simple_meeting(
+    def get_simple_meeting(
         request: Request,
         meeting_id: int,
         Authorization=Depends(Token.get_token_by_authorization),
