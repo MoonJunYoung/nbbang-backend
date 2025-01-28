@@ -73,6 +73,8 @@ class MeetingService:
         meeting = self.meeting_repository.read_by_id(id)
         meeting.is_user_of_meeting(user_id)
         meeting.create_share_link()
+        if meeting.is_simple:
+            meeting.create_simple_deposit_link()
         return meeting
 
     def read_simple_meeting(self, meeting_id, user_id):
