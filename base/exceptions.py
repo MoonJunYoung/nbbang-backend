@@ -8,7 +8,6 @@ logging.error(traceback.format_exc())
 
 
 def catch_exception(exce, requests: Request = None):
-    print(exce.__class__, "?????")
     if issubclass(exce.__class__, CustomException):
         logging.error(f"\n===\nA custom error occurred. : {exce}\n===")
         raise HTTPException(status_code=exce.status_code, detail=exce.detail)
