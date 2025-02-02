@@ -1,5 +1,6 @@
 import json
 
+from sqlalchemy import case, nulls_last
 from sqlalchemy.orm import Session
 
 from base.database_model import PaymentModel
@@ -48,7 +49,14 @@ class PaymentRepository:
 
     def read_list_by_meeting_id(self, meeting_id) -> list[Payment]:
         payments = list()
-        payment_models = self.db_session.query(PaymentModel).filter(PaymentModel.meeting_id == meeting_id).order_by(PaymentModel.order_no.asc()).all()
+        payment_models = (
+            self.db_session.query(PaymentModel)
+            .filter(PaymentModel.meeting_id == meeting_id)
+            .order_by(
+                case((PaymentModel.order_no == None, 1), else_=0),
+            )
+            .all()
+        )
         if not payment_models:
             return payments
         for payment_model in payment_models:
