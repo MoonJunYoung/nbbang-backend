@@ -6,7 +6,7 @@ from typing import Optional
 import jwt
 import requests
 from dotenv import load_dotenv
-from fastapi import Security
+from fastapi import Header, Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from base.exceptions import (
@@ -25,11 +25,17 @@ naver_state = os.environ.get("NAVER_STATE")
 
 
 class Token:
-    def get_token_by_authorization(Authorization: Optional[HTTPAuthorizationCredentials] = Security(HTTPBearer(auto_error=False))):
+    def get_token_by_authorization(
+        Authorization: Optional[HTTPAuthorizationCredentials] = Security(HTTPBearer(auto_error=False)),
+        authorization: Optional[str] = Header(default=None),
+    ):
         try:
-            if not Authorization:
+            if Authorization:
+                return Authorization.credentials
+            elif authorization:
+                return authorization
+            else:
                 raise MissingTokenException
-            return Authorization.credentials
         except Exception as e:
             catch_exception(e)
 
