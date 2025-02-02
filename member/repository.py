@@ -25,7 +25,7 @@ class MemberRepository:
         member_model.leader = member.leader
         self.db_session.commit()
 
-    def delete(self, member: Member, db_session: Session):
+    def delete(self, member: Member):
         member_model = self.db_session.query(MemberModel).filter(MemberModel.id == member.id).first()
         self.db_session.delete(member_model)
         self.db_session.commit()
