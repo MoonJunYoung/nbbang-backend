@@ -55,6 +55,7 @@ class PaymentRepository:
             .order_by(
                 case((PaymentModel.order_no == None, 1), else_=0),
             )
+            .order_by(PaymentModel.order_no.asc())
             .all()
         )
         if not payment_models:
