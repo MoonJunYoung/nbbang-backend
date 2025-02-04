@@ -29,8 +29,6 @@ class Token:
         Authorization: Optional[HTTPAuthorizationCredentials] = Security(HTTPBearer(auto_error=False)),
         authorization: Optional[str] = Header(default=None),
     ):
-        print("Bearer Authorization", Authorization)
-        print("basic authorization", authorization)
         try:
             if Authorization:
                 return Authorization.credentials
