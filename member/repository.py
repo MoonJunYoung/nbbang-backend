@@ -1,40 +1,37 @@
-from base.database_connector import MysqlCRUDTemplate
+from sqlalchemy.orm import Session
+
 from base.database_model import MemberModel
 from member.domain import Member
-from sqlalchemy.orm import Session
 
 
 class MemberRepository:
-    async def create(self, member: Member, db_session: Session):
+    def __init__(self, db_session: Session):
+        self.db_session = db_session
+
+    def create(self, member: Member):
         member_model = MemberModel(
             id=None,
             name=member.name,
             leader=member.leader,
             meeting_id=member.meeting_id,
         )
-        db_session.add(member_model)
-        db_session.commit()
+        self.db_session.add(member_model)
+        self.db_session.commit()
         member.id = member_model.id
 
-    async def update(self, member: Member, db_session: Session):
-        member_model = (
-            db_session.query(MemberModel).filter(MemberModel.id == member.id).first()
-        )
+    def update(self, member: Member):
+        member_model = self.db_session.query(MemberModel).filter(MemberModel.id == member.id).first()
         member_model.name = member.name
         member_model.leader = member.leader
-        db_session.commit()
+        self.db_session.commit()
 
-    async def delete(self, member: Member, db_session: Session):
-        member_model = (
-            db_session.query(MemberModel).filter(MemberModel.id == member.id).first()
-        )
-        db_session.delete(member_model)
-        db_session.commit()
+    def delete(self, member: Member):
+        member_model = self.db_session.query(MemberModel).filter(MemberModel.id == member.id).first()
+        self.db_session.delete(member_model)
+        self.db_session.commit()
 
-    async def read_by_id(self, member_id, db_session: Session):
-        member_model = (
-            db_session.query(MemberModel).filter(MemberModel.id == member_id).first()
-        )
+    def read_by_id(self, member_id):
+        member_model = self.db_session.query(MemberModel).filter(MemberModel.id == member_id).first()
         if not member_model:
             return None
         member = Member(
@@ -45,13 +42,9 @@ class MemberRepository:
         )
         return member
 
-    async def read_list_by_meeting_id(self, meeting_id, db_session: Session):
+    def read_list_by_meeting_id(self, meeting_id):
         members = list()
-        member_models = (
-            db_session.query(MemberModel)
-            .filter(MemberModel.meeting_id == meeting_id)
-            .all()
-        )
+        member_models = self.db_session.query(MemberModel).filter(MemberModel.meeting_id == meeting_id).all()
         if not member_models:
             return members
         for member_model in member_models:
@@ -72,13 +65,8 @@ class MemberRepository:
                 members.insert(0, member)
         return members
 
-    async def read_leader_member_by_meeting_id(self, meeting_id, db_session: Session):
-        member_model = (
-            db_session.query(MemberModel)
-            .filter(MemberModel.meeting_id == meeting_id)
-            .filter(MemberModel.leader == True)
-            .first()
-        )
+    def read_leader_member_by_meeting_id(self, meeting_id):
+        member_model = self.db_session.query(MemberModel).filter(MemberModel.meeting_id == meeting_id).filter(MemberModel.leader == True).first()
         if not member_model:
             return None
         member = Member(
@@ -89,8 +77,6 @@ class MemberRepository:
         )
         return member
 
-    async def delete_by_meeting_id(self, meeting_id, db_session: Session):
-        db_session.query(MemberModel).filter(
-            MemberModel.meeting_id == meeting_id
-        ).delete()
-        db_session.commit()
+    def delete_by_meeting_id(self, meeting_id):
+        self.db_session.query(MemberModel).filter(MemberModel.meeting_id == meeting_id).delete()
+        self.db_session.commit()
