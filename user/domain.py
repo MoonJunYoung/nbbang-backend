@@ -1,6 +1,7 @@
 import bcrypt
+
+from base.exceptions import IdentifierAlreadyException, PasswordNotMatchException
 from base.vo import KakaoDepositInformation, TossDepositInformation
-from user.exceptions import IdentifierAlreadyException, PasswordNotMatchException
 
 
 class User:
@@ -35,9 +36,7 @@ class User:
 
     def check_password_match(self, password):
         if not bcrypt.checkpw(password.encode(), self.password.encode()):
-            raise PasswordNotMatchException(
-                identifier=self.identifier, password=password
-            )
+            raise PasswordNotMatchException(identifier=self.identifier, password=password)
 
     def update_kakao_deposit_information(self, kakao_deposit_id):
         self.kakao_deposit_information = KakaoDepositInformation(kakao_deposit_id)

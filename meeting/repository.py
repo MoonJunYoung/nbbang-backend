@@ -1,6 +1,8 @@
+from fastapi import UploadFile
 from sqlalchemy.orm import Session
 
 from base.database_model import MeetingModel
+from base.storage_connector import StorageConnector
 from meeting.domain import Meeting
 from meeting.schema import SimpleMeetingRequest
 
@@ -92,6 +94,7 @@ class MeetingRepository:
             is_simple=meeting_model.is_simple,
             simple_price=meeting_model.simple_price,
             simple_member_count=meeting_model.simple_member_count,
+            images=meeting_model.images,
         )
         return meeting
 
@@ -113,3 +116,25 @@ class MeetingRepository:
             simple_member_count=meeting_model.simple_member_count,
         )
         return meeting
+
+    def read_images(self, meeting_id):
+        meeting_model = self.db_session.query(MeetingModel).filter(MeetingModel.id == meeting_id).first()
+        if not meeting_model:
+            return None
+        return meeting_model.images
+
+    def update_images(self, meeting_id, images):
+        meeting_model = self.db_session.query(MeetingModel).filter(MeetingModel.id == meeting_id).first()
+        meeting_model.images = images
+        self.db_session.commit()
+
+
+class ImageRepository:
+    def __init__(self):
+        self.storage_connector = StorageConnector()
+
+    async def upload_image(self, image: UploadFile):
+        await self.storage_connector.create_image(image)
+
+    def delete_image(self, image_key):
+        self.storage_connector.delete_image(image_key)
