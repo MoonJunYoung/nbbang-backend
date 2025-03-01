@@ -114,6 +114,7 @@ class MeetingRepository:
             is_simple=meeting_model.is_simple,
             simple_price=meeting_model.simple_price,
             simple_member_count=meeting_model.simple_member_count,
+            images=meeting_model.images,
         )
         return meeting
 
