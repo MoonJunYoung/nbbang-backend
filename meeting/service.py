@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import Depends, UploadFile
 from requests import Session
 
@@ -116,8 +118,12 @@ class MeetingService:
             return {"meeting": meeting, "members": members, "payments": payments}
 
     async def upload_images(self, images: list[UploadFile]):
+        result = []
         for image in images:
+            image.filename = f"{uuid.uuid4()}.webp"
             await self.image_repository.upload_image(image)
+            result.append(image.filename)
+        return result
 
     def update_images(self, id, user_id, images):
         meeting = self.meeting_repository.read_by_id(id)
