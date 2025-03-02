@@ -24,6 +24,7 @@ class MeetingRepository:
             is_simple=meeting.is_simple,
             simple_price=meeting.simple_price,
             simple_member_count=meeting.simple_member_count,
+            images=meeting.images,
         )
         self.db_session.add(meeting_model)
         self.db_session.commit()
