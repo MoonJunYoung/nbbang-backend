@@ -1,7 +1,7 @@
 import os
 
 from dotenv import load_dotenv
-from sqlalchemy import Boolean, Column, Integer, LargeBinary, String
+from sqlalchemy import JSON, Boolean, Column, Integer, LargeBinary, String
 from sqlalchemy.ext.declarative import declarative_base
 
 from base.database_connector import engine
@@ -58,8 +58,9 @@ class MeetingModel(Base):
     is_simple = Column(Boolean)
     simple_price = Column(Integer)
     simple_member_count = Column(Integer)
+    images = Column(JSON)
 
-    def __init__(self, id, name, date, user_id, uuid, account_number, bank, kakao_deposit_id, is_simple, simple_price, simple_member_count):
+    def __init__(self, id, name, date, user_id, uuid, account_number, bank, kakao_deposit_id, is_simple, simple_price, simple_member_count, images):
         self.id = id
         self.name = name
         self.date = date
@@ -71,6 +72,7 @@ class MeetingModel(Base):
         self.is_simple = is_simple
         self.simple_price = simple_price
         self.simple_member_count = simple_member_count
+        self.images = images
 
 
 class MemberModel(Base):

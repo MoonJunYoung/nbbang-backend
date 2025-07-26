@@ -2,10 +2,10 @@ from fastapi import Depends
 from requests import Session
 
 from base.database_connector import get_db_session
+from base.exceptions import IdentifierNotFoundException
 from meeting.repository import MeetingRepository
 from meeting.service import MeetingService
 from user.domain import User
-from user.exceptions import IdentifierNotFoundException
 from user.repository import UserRepository
 
 

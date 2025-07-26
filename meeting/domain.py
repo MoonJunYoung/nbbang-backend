@@ -24,6 +24,7 @@ class Meeting:
         simple_price=None,
         simple_member_count=None,
         simple_member_amount=None,
+        images=[],
     ) -> None:
         self.id = id
         self.name = name
@@ -36,6 +37,7 @@ class Meeting:
         self.simple_price = simple_price
         self.simple_member_count = simple_member_count
         self.simple_member_amount = simple_member_amount
+        self.images = images
         if self.is_simple and self.simple_price and self.simple_member_count:
             split_price = (
                 self.simple_price // self.simple_member_count + 1

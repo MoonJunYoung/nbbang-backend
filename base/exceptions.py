@@ -52,52 +52,70 @@ class CustomException(HTTPException):
 class InvalidTokenException(CustomException):
     def __init__(self) -> None:
         self.status_code = 401
-        self.detail = "invalid authorization token."
+        self.detail = "유효하지 않은 인증 토큰입니다."
 
 
 class MissingTokenException(CustomException):
     def __init__(self) -> None:
         self.status_code = 401
-        self.detail = "authorization token is missing."
+        self.detail = "인증 토큰이 없습니다."
 
 
 class MeetingUserMismatchException(CustomException):
     def __init__(self, user_id, meeting_id) -> None:
         self.status_code = 403
-        self.detail = f"this user:{user_id} does not own the meeting:{meeting_id}."
+        self.detail = f"{user_id} 사용자는 {meeting_id} 모임의 관리자가 아닙니다."
 
 
 class LeaderAlreadyException(CustomException):
     def __init__(self) -> None:
         self.status_code = 409
-        self.detail = "this meeting already has a leader."
+        self.detail = "이미 리더가 있습니다."
 
 
 class PaymentInMemberDeleteExcption(CustomException):
     def __init__(self) -> None:
         self.status_code = 409
-        self.detail = "it is not possible to delete the member you want to delete because it is included in the payment."
+        self.detail = "결제내역에 포홤된 멤버는 삭제할 수 없습니다."
 
 
 class MemberIsLeaderDeleteExcption(CustomException):
     def __init__(self) -> None:
         self.status_code = 409
-        self.detail = "the leader member cannot be deleted."
+        self.detail = "리더 멤버는 삭제할 수 없습니다."
 
 
 class SharePageNotMeetingExcption(CustomException):
     def __init__(self) -> None:
         self.status_code = 404
-        self.detail = "That shared page has been deleted or is invalid"
+        self.detail = "공유된 정산이 삭제되었거나 유효하지 않습니다."
 
 
 class IncompleteShareExcption(CustomException):
     def __init__(self) -> None:
         self.status_code = 204
-        self.detail = "This sharing page is not complete"
+        self.detail = "공유된 정산은 완료되지 않았습니다."
 
 
 class NotAgerrmentExcption(CustomException):
     def __init__(self) -> None:
         self.status_code = 403
-        self.detail = "need Agreement"
+        self.detail = "이용약관에 동의해야합니다."
+
+
+class IdentifierAlreadyException(CustomException):
+    def __init__(self, identifier) -> None:
+        self.status_code = 409
+        self.detail = "이미 사용중인 아이디입니다."
+
+
+class IdentifierNotFoundException(CustomException):
+    def __init__(self, identifier) -> None:
+        self.status_code = 401
+        self.detail = "아이디 또는 비밀번호가 일치하지 않습니다."
+
+
+class PasswordNotMatchException(CustomException):
+    def __init__(self, identifier, password) -> None:
+        self.status_code = 401
+        self.detail = "아이디 또는 비밀번호가 일치하지 않습니다."

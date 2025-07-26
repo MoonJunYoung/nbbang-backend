@@ -1,11 +1,13 @@
-from fastapi import Depends
+import uuid
+
+from fastapi import Depends, UploadFile
 from requests import Session
 
 from base.database_connector import get_db_session
 from base.exceptions import IncompleteShareExcption, SharePageNotMeetingExcption
 from calculate.domain import Calculate
 from meeting.domain import Meeting
-from meeting.repository import MeetingRepository
+from meeting.repository import ImageRepository, MeetingRepository
 from member.repository import MemberRepository
 from payment.repository import PaymentRepository
 from user.repository import UserRepository
@@ -17,6 +19,7 @@ def get_meeting_service(db_session: Session = Depends(get_db_session)):
 
 class MeetingService:
     def __init__(self, db_session: Session) -> None:
+        self.image_repository = ImageRepository()
         self.meeting_repository = MeetingRepository(db_session)
         self.member_repository = MemberRepository(db_session)
         self.payment_repository = PaymentRepository(db_session)
@@ -62,6 +65,10 @@ class MeetingService:
     def remove(self, id, user_id):
         meeting = self.meeting_repository.read_by_id(id)
         meeting.is_user_of_meeting(user_id)
+        del_images = self.meeting_repository.read_images(id)
+        if del_images:
+            for image in del_images:
+                self.image_repository.delete_image(image)
         if meeting.is_simple:
             self.meeting_repository.delete(meeting)
         else:
@@ -109,3 +116,22 @@ class MeetingService:
             for member in members:
                 member.create_deposit_link(meeting)
             return {"meeting": meeting, "members": members, "payments": payments}
+
+    async def upload_images(self, images: list[UploadFile]):
+        result = []
+        for image in images:
+            image.filename = f"{uuid.uuid4()}.webp"
+            await self.image_repository.upload_image(image)
+            result.append(image.filename)
+        return result
+
+    def update_images(self, id, user_id, images):
+        meeting = self.meeting_repository.read_by_id(id)
+        meeting.is_user_of_meeting(user_id)
+        pre_images = self.meeting_repository.read_images(id)
+        if pre_images:
+            for pre_image in pre_images:
+                if pre_image not in images:
+                    self.image_repository.delete_image(pre_image)
+
+        self.meeting_repository.update_images(id, images)

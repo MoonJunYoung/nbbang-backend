@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request, Response
+from fastapi import APIRouter, Depends, Request, Response, UploadFile
 
 from base.exceptions import catch_exception
 from base.token import Token
@@ -170,5 +170,32 @@ class MeetingPresentation:
                 bank=deposit_information_data.bank,
                 account_number=deposit_information_data.account_number,
             )
+        except Exception as e:
+            catch_exception(e)
+
+    @router.post("/{meeting_id}/images", status_code=200)
+    async def upload_images(
+        meeting_id: int,
+        images: list[UploadFile],
+        Authorization=Depends(Token.get_token_by_authorization),
+        meeting_service: MeetingService = Depends(get_meeting_service),
+    ):
+        try:
+            Token.get_user_id_by_token(token=Authorization)
+            result = await meeting_service.upload_images(images)
+            return result
+        except Exception as e:
+            catch_exception(e)
+
+    @router.patch("/{meeting_id}/images", status_code=200)
+    def update_images(
+        meeting_id: int,
+        images: list[str],
+        Authorization=Depends(Token.get_token_by_authorization),
+        meeting_service: MeetingService = Depends(get_meeting_service),
+    ):
+        try:
+            user_id = Token.get_user_id_by_token(token=Authorization)
+            meeting_service.update_images(meeting_id, user_id, images)
         except Exception as e:
             catch_exception(e)
