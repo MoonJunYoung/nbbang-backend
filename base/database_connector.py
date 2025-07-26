@@ -7,21 +7,20 @@ from sqlalchemy.orm import sessionmaker
 load_dotenv()
 
 service_env = os.environ.get("SERVICE_ENV")
-
+host = os.environ.get("DB_HOST")
+port = os.environ.get("DB_PORT")
+user_name = os.environ.get("DB_USERNAME")
+passwd = os.environ.get("DB_PASSWD")
+database = os.environ.get("DB_DATABASE")
 if service_env == "dev":
-    engine = create_engine("mysql+pymysql://root:answnsdud1@localhost:3306/nbbang")
+    engine = create_engine(f"postgresql+psycopg2://{user_name}:{passwd}@{host}:{port}/postgres")
     SessionLocal = sessionmaker(bind=engine)
 
 else:
-    host = os.environ.get("DB_HOST")
-    port = os.environ.get("DB_PORT")
-    user_name = os.environ.get("DB_USERNAME")
-    passwd = os.environ.get("DB_PASSWD")
-    database = os.environ.get("DB_DATABASE")
     if service_env == "test":
-        engine = create_engine(f"mysql+pymysql://{user_name}:{passwd}@{host}:{port}/{database}-test")
+        engine = create_engine(f"postgresql+psycopg2://{user_name}:{passwd}@{host}:{port}/postgres/")
     else:
-        engine = create_engine(f"mysql+pymysql://{user_name}:{passwd}@{host}:{port}/{database}")
+        engine = create_engine(f"postgresql+psycopg2://{user_name}:{passwd}@{host}:{port}/postgres/")
     SessionLocal = sessionmaker(bind=engine)
 
 

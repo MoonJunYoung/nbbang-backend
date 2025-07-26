@@ -1,18 +1,20 @@
 import os
 
 from dotenv import load_dotenv
-from sqlalchemy import JSON, Boolean, Column, Integer, LargeBinary, String
+from sqlalchemy import JSON, Boolean, Column, Integer, LargeBinary, MetaData, String
 from sqlalchemy.ext.declarative import declarative_base
 
 from base.database_connector import engine
 
 load_dotenv()
-Base = declarative_base()
+service_env = os.environ.get("SERVICE_ENV")
+metadata=MetaData(schema=f"nbbang_{service_env}")
+Base = declarative_base(metadata=metadata)
 
 
 class UserModel(Base):
     __tablename__ = "user"
-    id = Column("id", Integer, primary_key=True)
+    id = Column("id", Integer, primary_key=True, autoincrement=True)
     name = Column(String)
     platform = Column(String)
     platform_id = Column(String)
@@ -47,7 +49,7 @@ class UserModel(Base):
 
 class MeetingModel(Base):
     __tablename__ = "meeting"
-    id = Column("id", Integer, primary_key=True)
+    id = Column("id", Integer, primary_key=True, autoincrement=True)
     name = Column(String)
     date = Column(String)
     user_id = Column(Integer)
@@ -77,7 +79,7 @@ class MeetingModel(Base):
 
 class MemberModel(Base):
     __tablename__ = "member"
-    id = Column("id", Integer, primary_key=True)
+    id = Column("id", Integer, primary_key=True, autoincrement=True)
     name = Column(String)
     leader = Column(Boolean)
     meeting_id = Column(Integer)
@@ -91,7 +93,7 @@ class MemberModel(Base):
 
 class PaymentModel(Base):
     __tablename__ = "payment"
-    id = Column("id", Integer, primary_key=True)
+    id = Column("id", Integer, primary_key=True, autoincrement=True)
     place = Column(String)
     price = Column(Integer)
     pay_member_id = Column(Integer)
