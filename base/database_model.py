@@ -1,5 +1,6 @@
 import os
 
+import requests
 from dotenv import load_dotenv
 from sqlalchemy import JSON, Boolean, Column, Integer, LargeBinary, MetaData, String
 from sqlalchemy.ext.declarative import declarative_base
@@ -8,12 +9,12 @@ from base.database_connector import engine
 
 load_dotenv()
 service_env = os.environ.get("SERVICE_ENV")
-metadata=MetaData(schema=f"nbbang_{service_env}")
+metadata = MetaData(schema=f"public")
 Base = declarative_base(metadata=metadata)
 
 
 class UserModel(Base):
-    __tablename__ = "user"
+    __tablename__ = f"{service_env}_user"
     id = Column("id", Integer, primary_key=True, autoincrement=True)
     name = Column(String)
     platform = Column(String)
@@ -48,7 +49,7 @@ class UserModel(Base):
 
 
 class MeetingModel(Base):
-    __tablename__ = "meeting"
+    __tablename__ = f"{service_env}_meeting"
     id = Column("id", Integer, primary_key=True, autoincrement=True)
     name = Column(String)
     date = Column(String)
@@ -78,7 +79,7 @@ class MeetingModel(Base):
 
 
 class MemberModel(Base):
-    __tablename__ = "member"
+    __tablename__ = f"{service_env}_member"
     id = Column("id", Integer, primary_key=True, autoincrement=True)
     name = Column(String)
     leader = Column(Boolean)
@@ -92,7 +93,7 @@ class MemberModel(Base):
 
 
 class PaymentModel(Base):
-    __tablename__ = "payment"
+    __tablename__ = f"{service_env}_payment"
     id = Column("id", Integer, primary_key=True, autoincrement=True)
     place = Column(String)
     price = Column(Integer)
@@ -111,6 +112,4 @@ class PaymentModel(Base):
         self.order_no = order_no
 
 
-service_env = os.environ.get("SERVICE_ENV")
-if service_env == "dev":
-    Base.metadata.create_all(engine)
+Base.metadata.create_all(engine)

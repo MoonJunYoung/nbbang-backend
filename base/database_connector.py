@@ -12,16 +12,8 @@ port = os.environ.get("DB_PORT")
 user_name = os.environ.get("DB_USERNAME")
 passwd = os.environ.get("DB_PASSWD")
 database = os.environ.get("DB_DATABASE")
-if service_env == "dev":
-    engine = create_engine(f"postgresql+psycopg2://{user_name}:{passwd}@{host}:{port}/postgres")
-    SessionLocal = sessionmaker(bind=engine)
-
-else:
-    if service_env == "test":
-        engine = create_engine(f"postgresql+psycopg2://{user_name}:{passwd}@{host}:{port}/postgres/")
-    else:
-        engine = create_engine(f"postgresql+psycopg2://{user_name}:{passwd}@{host}:{port}/postgres/")
-    SessionLocal = sessionmaker(bind=engine)
+engine = create_engine(f"postgresql+psycopg2://{user_name}:{passwd}@{host}:{port}/postgres")
+SessionLocal = sessionmaker(bind=engine)
 
 
 def get_db_session():
