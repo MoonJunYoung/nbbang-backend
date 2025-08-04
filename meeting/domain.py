@@ -92,9 +92,9 @@ class Meeting:
 
     def create_share_link(self):
         if self.is_simple:
-            self.share_link = f"https://nbbang.life/share?simple-meeting={self.uuid}"
+            self.share_link = f"https://nbbang.shop/share?simple-meeting={self.uuid}"
         else:
-            self.share_link = f"https://nbbang.life/share?meeting={self.uuid}"
+            self.share_link = f"https://nbbang.shop/share?meeting={self.uuid}"
 
     def _create_toss_deposit_link(self, amount, bank, account_number):
         base_url = "supertoss://send"
