@@ -30,12 +30,13 @@ app.add_middleware(
 @app.options("/{rest_of_path:path}")
 async def preflight(rest_of_path: str, request: Request):
     return JSONResponse(
+        content={},  # 빈 JSON 객체를 명시적으로 추가!
         headers={
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
             "Access-Control-Allow-Headers": "*",
             "Access-Control-Expose-Headers": "*",
-        }
+        },
     )
 
 
