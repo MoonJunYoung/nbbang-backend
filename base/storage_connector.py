@@ -9,8 +9,13 @@ load_dotenv()
 
 import boto3
 
-AWS_ACCESS_KEY = os.environ.get("AWS_ACCESS_KEY")
-AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+AWS_S3_ACCESS_KEY = os.environ.get("AWS_S3_ACCESS_KEY")
+AWS_S3_SECRET_ACCESS_KEY = os.environ.get("AWS_S3_SECRET_ACCESS_KEY")
+
+print("================================================")
+print(AWS_S3_ACCESS_KEY)
+print(AWS_S3_SECRET_ACCESS_KEY)
+print("================================================")
 
 
 class StorageConnector:
@@ -18,8 +23,8 @@ class StorageConnector:
         self.storage_client = boto3.client(
             "s3",
             region_name="ap-northeast-2",
-            aws_access_key_id=AWS_ACCESS_KEY,
-            aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+            aws_access_key_id=AWS_S3_ACCESS_KEY,
+            aws_secret_access_key=AWS_S3_SECRET_ACCESS_KEY,
         )
 
     async def create_image(self, image: UploadFile):
