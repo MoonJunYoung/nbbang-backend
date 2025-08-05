@@ -35,4 +35,4 @@ class StorageConnector:
         )
 
     def delete_image(self, filename):
-        self.storage_client.delete_object(Bucket="nbbang-images", Key=filename + ".webp")
+        self.storage_client.delete_object(Bucket="nbbang-receipt-images", Key=filename + ".webp")
