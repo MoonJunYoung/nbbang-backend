@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   production:
     build: ./
@@ -7,7 +7,7 @@ services:
     env_file:
       - .env
     environment:
-      - SERVICE_ENV=production
+      - SERVICE_ENV=prod
 
   test:
     build: ./
