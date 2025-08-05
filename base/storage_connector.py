@@ -27,7 +27,7 @@ class StorageConnector:
         file_like_object = io.BytesIO(contents)
         self.storage_client.upload_fileobj(
             file_like_object,
-            "nbbang-images",
+            "nbbang-receipt-images",
             image.filename,
             ExtraArgs={
                 "ContentType": "image/webp",
@@ -35,4 +35,4 @@ class StorageConnector:
         )
 
     def delete_image(self, filename):
-        self.storage_client.delete_object(Bucket="nbbang-images", Key=filename + ".webp")
+        self.storage_client.delete_object(Bucket="nbbang-receipt-images", Key=filename + ".webp")
