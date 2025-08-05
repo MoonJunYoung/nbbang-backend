@@ -27,7 +27,7 @@ class StorageConnector:
         file_like_object = io.BytesIO(contents)
         self.storage_client.upload_fileobj(
             file_like_object,
-            "nbbang-images",
+            "nbbang-receipt-images",
             image.filename,
             ExtraArgs={
                 "ContentType": "image/webp",
