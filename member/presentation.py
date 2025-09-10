@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
 from base.exceptions import catch_exception
-from base.token import Token
+from base.security import Token
 from member.service import MemberService, get_member_service
 
 

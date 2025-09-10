@@ -6,7 +6,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel
 
 from base.exceptions import NotAgerrmentExcption, catch_exception
-from base.token import Token
+from base.security import Token
 from user.service import UserService, get_user_service
 
 
