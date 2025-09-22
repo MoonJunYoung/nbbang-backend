@@ -1,27 +1,19 @@
 import os
 
 import uvicorn
-from fastapi import FastAPI
+from dotenv import load_dotenv
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from mangum import Mangum
 
 from meeting.presentation import MeetingPresentation
 from member.presentation import MemberPresentation
 from payment.presentation import PaymentPresentation
 from user.presentation import UserPresentation
 
+load_dotenv()
 app = FastAPI()
-
-
-# origins = ["https://nbbang.life"]
-
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=origins,
-#     allow_credentials=True,
-#     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
-#     allow_headers=["Authorization"],
-#     expose_headers=["Location"],
-# )
 
 
 origins = ["*"]
@@ -35,6 +27,19 @@ app.add_middleware(
 )
 
 
+@app.options("/{rest_of_path:path}")
+async def preflight(rest_of_path: str, request: Request):
+    return JSONResponse(
+        content={},  # 빈 JSON 객체를 명시적으로 추가!
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PUT,DELETE",
+            "Access-Control-Allow-Headers": "*",
+            "Access-Control-Expose-Headers": "*",
+        },
+    )
+
+
 @app.get("/", status_code=200)
 def haelth_check():
     return True
@@ -45,9 +50,9 @@ app.include_router(MeetingPresentation.router)
 app.include_router(MemberPresentation.router)
 app.include_router(PaymentPresentation.router)
 
+SERVICE_ENV = os.environ.get("SERVICE_ENV")
 
-if __name__ == "__main__":
-    if os.environ.get("SERVICE_ENV") == "dev":
-        uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
-    else:
-        uvicorn.run("main:app", host="0.0.0.0", port=8000)
+handler = Mangum(app)
+
+if __name__ == "__main__" and SERVICE_ENV == "dev":
+    uvicorn.run("main:app", host="0.0.0.0", port=8001, reload=True)

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Request, Response, UploadFile
 
 from base.exceptions import catch_exception
-from base.token import Token
+from base.security import Token
 from meeting.schema import (
     DepositInformationRequest,
     MeetingRequest,
