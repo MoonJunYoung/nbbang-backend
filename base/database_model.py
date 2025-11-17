@@ -1,8 +1,18 @@
+import datetime
 import os
 
 import requests
 from dotenv import load_dotenv
-from sqlalchemy import JSON, Boolean, Column, Integer, LargeBinary, MetaData, String
+from sqlalchemy import (
+    JSON,
+    Boolean,
+    Column,
+    DateTime,
+    Integer,
+    LargeBinary,
+    MetaData,
+    String,
+)
 from sqlalchemy.ext.declarative import declarative_base
 
 from base.database_connector import engine
@@ -24,6 +34,9 @@ class UserModel(Base):
     kakao_deposit_id = Column(String)
     identifier = Column(String)
     password = Column(String)
+    type = Column(String)
+    created_at = Column(DateTime, default=datetime.datetime.now)
+    updated_at = Column(DateTime, onupdate=datetime.datetime.now)
 
     def __init__(
         self,
@@ -36,6 +49,7 @@ class UserModel(Base):
         kakao_deposit_id,
         identifier,
         password,
+        type,
     ):
         self.id = id
         self.name = name
@@ -46,6 +60,7 @@ class UserModel(Base):
         self.kakao_deposit_id = kakao_deposit_id
         self.identifier = identifier
         self.password = password
+        self.type = type
 
 
 class MeetingModel(Base):

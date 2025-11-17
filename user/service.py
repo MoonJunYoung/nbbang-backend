@@ -7,6 +7,7 @@ from meeting.repository import MeetingRepository
 from meeting.service import MeetingService
 from user.domain import User
 from user.repository import UserRepository
+from user.schemas import GuestUpdateData
 
 
 def get_user_service(db_session: Session = Depends(get_db_session)):
@@ -25,6 +26,7 @@ class UserService:
             name=name,
             identifier=identifier,
             password=password,
+            type="user",
         )
         if self.user_repository.read_by_identifier(identifier=user.identifier):
             user.identifier_is_not_unique()
@@ -47,6 +49,7 @@ class UserService:
             platform=platform,
             identifier=None,
             password=None,
+            type="user",
         )
         existing_user = self.user_repository.read_by_platform_id(
             platform_id=user.platform_id,
@@ -64,6 +67,7 @@ class UserService:
             platform=platform,
             identifier=None,
             password=None,
+            type="user",
         )
         self.user_repository.create(user)
         return user
@@ -89,3 +93,21 @@ class UserService:
         for meeting in meetings:
             self.meeting_service.remove(meeting.id, user.id)
         self.user_repository.delete(user.id)
+
+    def create_guest(self):
+        user = User(
+            id=None,
+            name=None,
+            identifier=None,
+            password=None,
+            platform_id=None,
+            platform=None,
+            type="guest",
+        )
+        self.user_repository.create(user)
+        return user.id
+
+    def update_guest(self, user_id, guest_update_data: GuestUpdateData):
+        user = self.user_repository.read_by_user_id(user_id)
+        user.update_guest_information(guest_update_data)
+        self.user_repository.update_user(user)
