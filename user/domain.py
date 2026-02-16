@@ -2,6 +2,7 @@ import bcrypt
 
 from base.exceptions import IdentifierAlreadyException, PasswordNotMatchException
 from base.vo import KakaoDepositInformation, TossDepositInformation
+from user.schemas import GuestUpdateData
 
 
 class User:
@@ -16,6 +17,7 @@ class User:
         bank=None,
         account_number=None,
         kakao_deposit_id=None,
+        type=None,
     ) -> None:
         self.id = id
         self.name = name
@@ -25,6 +27,7 @@ class User:
         self.password = password
         self.toss_deposit_information = TossDepositInformation(bank, account_number)
         self.kakao_deposit_information = KakaoDepositInformation(kakao_deposit_id)
+        self.type = type
 
     def identifier_is_not_unique(self):
         raise IdentifierAlreadyException(self.identifier)
@@ -43,3 +46,15 @@ class User:
 
     def update_toss_deposit_information(self, bank, account_number):
         self.toss_deposit_information = TossDepositInformation(bank, account_number)
+
+    def update_guest_information(self, guest_update_data: GuestUpdateData):
+        if guest_update_data.longin_data:
+            self.identifier = guest_update_data.longin_data.identifier
+            self.password = guest_update_data.longin_data.password
+            self.name = guest_update_data.longin_data.name
+            self.type = "user"
+        elif guest_update_data.oauth_data:
+            self.platform_id = guest_update_data.oauth_data.platform_id
+            self.platform = guest_update_data.oauth_data.platform
+            self.name = guest_update_data.oauth_data.name
+            self.type = "user"

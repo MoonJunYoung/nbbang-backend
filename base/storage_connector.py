@@ -12,11 +12,6 @@ import boto3
 AWS_S3_ACCESS_KEY = os.environ.get("AWS_S3_ACCESS_KEY")
 AWS_S3_SECRET_ACCESS_KEY = os.environ.get("AWS_S3_SECRET_ACCESS_KEY")
 
-print("================================================")
-print(AWS_S3_ACCESS_KEY)
-print(AWS_S3_SECRET_ACCESS_KEY)
-print("================================================")
-
 
 class StorageConnector:
     def __init__(self) -> None:

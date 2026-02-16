@@ -1,33 +1,11 @@
 import json
-from typing import Optional
 
-from fastapi import APIRouter, Depends, Request, Response, Security, status
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from pydantic import BaseModel
+from fastapi import APIRouter, Depends, Request, Response, status
 
 from base.exceptions import NotAgerrmentExcption, catch_exception
 from base.security import Token
+from user.schemas import DepositInformationData, GuestUpdateData, LogInData, OauthData
 from user.service import UserService, get_user_service
-
-
-class LogInData(BaseModel):
-    identifier: str
-    password: str
-    name: str = None
-
-
-class OauthData(BaseModel):
-    token: str = None
-    platform: str = None
-    platform_id: str = None
-    name: str = None
-    agreement: bool = None
-
-
-class DepositInformationData(BaseModel):
-    bank: Optional[str] = None
-    account_number: Optional[str] = None
-    kakao_deposit_id: Optional[str] = None
 
 
 def oauth_login(
@@ -190,5 +168,27 @@ class UserPresentation:
                 bank=deposit_information_data.bank,
                 account_number=deposit_information_data.account_number,
             )
+        except Exception as e:
+            catch_exception(e)
+
+    @router.post("/guest", status_code=201)
+    def create_guest(
+        user_service: UserService = Depends(get_user_service),
+    ):
+        try:
+            user_id = user_service.create_guest()
+            return Token.create_token_by_user_id(user_id)
+        except Exception as e:
+            catch_exception(e)
+
+    @router.put("/guest", status_code=200)
+    def update_guest(
+        guest_update_data: GuestUpdateData,
+        user_service: UserService = Depends(get_user_service),
+        Authorization=Depends(Token.get_token_by_authorization),
+    ):
+        try:
+            user_id = Token.get_user_id_by_token(token=Authorization)
+            user_service.update_guest(user_id, guest_update_data)
         except Exception as e:
             catch_exception(e)

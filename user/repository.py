@@ -19,6 +19,7 @@ class UserRepository:
             kakao_deposit_id=None,
             identifier=user.identifier,
             password=user.password,
+            type=user.type,
         )
         self.db_session.add(user_model)
         self.db_session.commit()
@@ -40,6 +41,7 @@ class UserRepository:
             platform=user_model.platform,
             identifier=user_model.identifier,
             password=user_model.password,
+            type=user_model.type,
         )
         return user
 
@@ -54,6 +56,7 @@ class UserRepository:
             platform=user_model.platform,
             identifier=user_model.identifier,
             password=user_model.password,
+            type=user_model.type,
         )
         return user
 
@@ -71,6 +74,7 @@ class UserRepository:
             bank=user_model.bank,
             account_number=user_model.account_number,
             kakao_deposit_id=user_model.kakao_deposit_id,
+            type=user_model.type,
         )
         return user
 
@@ -83,4 +87,12 @@ class UserRepository:
     def update_kakao_deposit(self, user: User):
         user_model = self.db_session.query(UserModel).filter(UserModel.id == user.id).first()
         user_model.kakao_deposit_id = user.kakao_deposit_information.kakao_deposit_id
+        self.db_session.commit()
+
+    def update_user(self, user: User):
+        user_model = self.db_session.query(UserModel).filter(UserModel.id == user.id).first()
+        user_model.identifier = user.identifier
+        user_model.password = user.password
+        user_model.name = user.name
+        user_model.type = user.type
         self.db_session.commit()
