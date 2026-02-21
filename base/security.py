@@ -18,7 +18,6 @@ from base.exceptions import (
 load_dotenv()
 secret_key = os.environ.get("JWT_SECRET_KEY")
 kakao_cilent_id = os.environ.get("KAKAO_CLIENT_ID")
-kakao_redirect_url = os.environ.get("KAKAO_REDIRECT_URL")
 naver_client_id = os.environ.get("NAVER_CLIENT_ID")
 naver_client_secret = os.environ.get("NAVER_CLIENT_SECRET")
 naver_state = os.environ.get("NAVER_STATE")
@@ -63,6 +62,10 @@ class Token:
 
     def get_user_name_and_platform_id_by_kakao_oauth(token):
         def _get_user_access_token_by_kakao_oauth(token):
+            if os.environ.get("SERVICE_ENV") == "dev":
+                kakao_redirect_url = "http://localhost:5173/kakao-redirect"
+            else:
+                kakao_redirect_url = "https://nbbang.shop/kakao-redirect"
             data = {
                 "grant_type": "authorization_code",
                 "client_id": kakao_cilent_id,
