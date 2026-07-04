@@ -65,7 +65,7 @@ class Token:
             if os.environ.get("SERVICE_ENV") == "dev":
                 kakao_redirect_url = "http://localhost:5173/kakao-redirect"
             else:
-                kakao_redirect_url = "https://nbbang.shop/kakao-redirect"
+                kakao_redirect_url = "https://nbbang.cloud/kakao-redirect"
             data = {
                 "grant_type": "authorization_code",
                 "client_id": kakao_cilent_id,
