@@ -1,6 +1,6 @@
 # Nbbnag
 
-[https://nbbang.shop/](https://nbbang.shop/)
+[https://nbbang.cloud/](https://nbbang.cloud/)
 
 <p align="center">
   <img src="https://github.com/moonjunyoung/nbbang/assets/110980148/f5abe421-22db-4e43-9583-dbaf3ac58886" alt="nbbang_Logo">
