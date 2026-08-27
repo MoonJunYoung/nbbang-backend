@@ -1,7 +1,8 @@
 from fastapi import UploadFile
+from sqlalchemy import exists, or_
 from sqlalchemy.orm import Session
 
-from base.database_model import MeetingModel
+from base.database_model import MeetingModel, MemberModel, PaymentModel
 from base.storage_connector import StorageConnector
 from meeting.domain import Meeting
 from meeting.schema import SimpleMeetingRequest
@@ -65,6 +66,42 @@ class MeetingRepository:
     def read_list_by_user_id(self, user_id) -> list[Meeting]:
         meetings = list()
         meeting_models = self.db_session.query(MeetingModel).filter(MeetingModel.user_id == user_id).order_by(MeetingModel.id.desc()).all()
+        if not meeting_models:
+            return meetings
+        for meeting_model in meeting_models:
+            meeting = Meeting(
+                id=meeting_model.id,
+                name=meeting_model.name,
+                date=meeting_model.date,
+                user_id=meeting_model.user_id,
+                uuid=meeting_model.uuid,
+                is_simple=meeting_model.is_simple,
+            )
+            meetings.append(meeting)
+        return meetings
+
+    def search(self, user_id, query) -> list[Meeting]:
+        meetings = list()
+        keyword = f"%{query}%"
+        meeting_models = (
+            self.db_session.query(MeetingModel)
+            .filter(MeetingModel.user_id == user_id)
+            .filter(
+                or_(
+                    MeetingModel.name.ilike(keyword),
+                    exists().where(
+                        PaymentModel.meeting_id == MeetingModel.id,
+                        PaymentModel.place.ilike(keyword),
+                    ),
+                    exists().where(
+                        MemberModel.meeting_id == MeetingModel.id,
+                        MemberModel.name.ilike(keyword),
+                    ),
+                )
+            )
+            .order_by(MeetingModel.id.desc())
+            .all()
+        )
         if not meeting_models:
             return meetings
         for meeting_model in meeting_models:

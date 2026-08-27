@@ -94,6 +94,11 @@ class MeetingService:
         meetings = self.meeting_repository.read_list_by_user_id(user_id)
         return meetings
 
+    def search(self, user_id, query):
+        if not query or not query.strip():
+            return []
+        return self.meeting_repository.search(user_id, query.strip())
+
     def read_share_page(self, uuid):
         meeting = self.meeting_repository.read_by_uuid(uuid)
         if not meeting:

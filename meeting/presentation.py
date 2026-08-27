@@ -95,6 +95,19 @@ class MeetingPresentation:
         except Exception as e:
             catch_exception(e)
 
+    @router.get("/search", status_code=200)
+    def search_meetings(
+        q: str,
+        Authorization=Depends(Token.get_token_by_authorization),
+        meeting_service: MeetingService = Depends(get_meeting_service),
+    ):
+        try:
+            user_id = Token.get_user_id_by_token(token=Authorization)
+            meetings = meeting_service.search(user_id, q)
+            return meetings
+        except Exception as e:
+            catch_exception(e)
+
     @router.get("/{meeting_id}", status_code=200)
     def read(
         meeting_id: int,
